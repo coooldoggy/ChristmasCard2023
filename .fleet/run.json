@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        
+        {
+            "name": "ChristmasCard2023 [composeApp:wasmJsBrowserRun]",
+            "type": "gradle",
+            "workingDir": "/Users/yulim/dev/workspace_kmm/ChristmasCard2023",
+            "tasks": ["composeApp:wasmJsBrowserRun"],
+            "args": [""],
+            "initScripts": {
+                "flmapper": "ext.mapPath = { path -> null }"
+            }
+        }
+    ]
+}
