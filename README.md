@@ -1,19 +1,20 @@
-This is a Kotlin Multiplatform project targeting Web.
+## About This Project 🤯
+This project started to make ChristMasCard🎅🏻 for my friends using KMP Wasm.
+However, lack of resources and library I couldn't make it on time....
+So I will keep making this project and send this card next year lol :) 😂 
 
-* `/composeApp` is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - `commonMain` is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to use Apple’s CoreCrypto for the iOS part of your Kotlin app,
-    `iosMain` would be the right folder for such calls.
+## What I have suffered 
+- Lottie is Not supported in wasm 🥲
+- Finding Library that can replace lottie 😶‍🌫️
+  - [Trial]
+  - Skiko : JetBrain Library -> Cannot use this because I cannot use Java.io.File, So I tried to use JS fuction as external function but I failed. Worth to retry 🥺
+  - Kamel : I dunno why yet. Should have to figure it out 
 
-
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
-
-**Note:** Compose/Web is Experimental and may be changed at any time. Use it only for evaluation purposes.
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
-
-You can open the web application by running the `:composeApp:wasmJsBrowserDevelopmentRun` Gradle task.
+## References 
+[Kotlin Wasm](https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance)https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance
+[Getting Start with Wasm](https://kotlinlang.org/docs/wasm-get-started.html#run-the-application)https://kotlinlang.org/docs/wasm-get-started.html#run-the-application
+[Skiko](https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html)https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html
+[Compottie](https://github.com/alexzhirkevich/compottie)https://github.com/alexzhirkevich/compottie
+[Kamel](https://github.com/Kamel-Media/Kamel)https://github.com/Kamel-Media/Kamel
+[Kmp Awesome](https://github.com/terrakok/kmp-awesome)https://github.com/terrakok/kmp-awesome
+[Kotlin-wasm-example](https://github.com/Kotlin/kotlin-wasm-examples/tree/main)https://github.com/Kotlin/kotlin-wasm-examples/tree/main
