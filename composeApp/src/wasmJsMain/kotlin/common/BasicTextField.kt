@@ -1,4 +1,4 @@
-package com.coooldoggy.emotionaloutlet.common
+package common
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -107,7 +107,7 @@ fun BasicTextField(
                         interactionSource = interactionSource,
                         cursorBrush = cursorBrush,
                         decorationBox = decorationBox ?: { innerTextField ->
-                            TextFieldDefaults.TextFieldDecorationBox(
+                            TextFieldDefaults.DecorationBox(
                                 value = value,
                                 innerTextField = innerTextField,
                                 enabled = enabled,
@@ -121,8 +121,12 @@ fun BasicTextField(
                                         color = hintColor,
                                     )
                                 },
+                                colors = TextFieldDefaults.colors(
+                                    focusedContainerColor = Color.White,
+                                    unfocusedContainerColor = Color.White,
+                                    disabledContainerColor = Color.White,
+                                ),
                                 contentPadding = contentPadding,
-                                colors = TextFieldDefaults.textFieldColors(containerColor = Color.White),
                             )
                         }
                     )

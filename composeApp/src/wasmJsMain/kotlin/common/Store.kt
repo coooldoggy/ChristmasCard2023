@@ -1,5 +1,8 @@
-package com.coooldoggy.emotionaloutlet
+package common
 
+import Action
+import State
+import christmasCardReducer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +24,7 @@ fun CoroutineScope.createStore(): Store {
         init {
             launch {
                 channel.consumeAsFlow().collect { action ->
-                    mutableStateFlow.value = chatReducer(mutableStateFlow.value, action)
+                    mutableStateFlow.value = christmasCardReducer(mutableStateFlow.value, action)
                 }
             }
         }
