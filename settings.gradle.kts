@@ -1,4 +1,4 @@
-rootProject.name = "ChristmasCard2023"
+rootProject.name = "christmas-card"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

@@ -1,5 +1,6 @@
 package file
 import kotlinx.serialization.Serializable
+import kotlin.js.Promise
 
 @Serializable
 data class FileData(
@@ -7,4 +8,4 @@ data class FileData(
     val jsonString: String?
 )
 
-external fun getData(filePath: String): String
+external fun getData(filePath: String): String 

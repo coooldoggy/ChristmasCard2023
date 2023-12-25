@@ -2,6 +2,16 @@ import org.jetbrains.compose.ExperimentalComposeLibrary
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
+import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBinary
+import org.jetbrains.kotlin.gradle.tasks.KotlinNativeLink
+import org.jetbrains.kotlin.library.impl.KotlinLibraryLayoutImpl
+import java.io.File
+import java.io.FileFilter
+import org.jetbrains.kotlin.konan.file.File as KonanFile
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -9,9 +19,8 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 
-
 val osName = System.getProperty("os.name")
-val targetOs = when {
+val hostOs = when {
     osName == "Mac OS X" -> "macos"
     osName.startsWith("Win") -> "windows"
     osName.startsWith("Linux") -> "linux"
@@ -19,25 +28,33 @@ val targetOs = when {
 }
 
 val osArch = System.getProperty("os.arch")
-var targetArch = when (osArch) {
+var hostArch = when (osArch) {
     "x86_64", "amd64" -> "x64"
     "aarch64" -> "arm64"
     else -> error("Unsupported arch: $osArch")
 }
 
-val target = "${targetOs}-${targetArch}"
+val host = "${hostOs}-${hostArch}"
 
 var version = "0.0.0-SNAPSHOT"
 if (project.hasProperty("skiko.version")) {
     version = project.properties["skiko.version"] as String
 }
 
-val resourcesDir = file("$buildDir/resources/")
-val absolutePath = resourcesDir.absolutePath
-
+val resourcesDir = "$buildDir/resources"
 val skikoWasm by configurations.creating
 
 val isCompositeBuild = extra.properties.getOrDefault("skiko.composite.build", "") == "1"
+
+val unzipTask = tasks.register("unzipWasm", Copy::class) {
+    destinationDir = file(resourcesDir)
+    from(skikoWasm.map { zipTree(it) })
+
+    if (isCompositeBuild) {
+        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
+        dependsOn(skikoWasmJarTask)
+    }
+}
 
 dependencies {
     if (isCompositeBuild) {
@@ -47,19 +64,6 @@ dependencies {
     } else {
         skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
     }
-}
-
-val unzipTask = tasks.register("unzipWasm", Copy::class) {
-    destinationDir = file(absolutePath)
-    from(skikoWasm.map { zipTree(it) })
-
-    if (isCompositeBuild) {
-        val skikoWasmJarTask = gradle.includedBuild("skiko").task(":skikoWasmJar")
-        dependsOn(skikoWasmJarTask)
-    }
-
-    // Set duplicatesStrategy for the unzip task
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 kotlin {
@@ -81,7 +85,7 @@ kotlin {
         }
         binaries.executable()
     }
-    
+
     sourceSets {
         commonMain.dependencies {
             implementation(compose.runtime)
@@ -93,7 +97,10 @@ kotlin {
 //            implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.2.2-compose-experimental")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
+           implementation("media.kamel:kamel-image:0.9.1")
             implementation("org.jetbrains.skiko:skiko:$version")
+            implementation("io.ktor:ktor-client-core:2.3.7")
+            implementation("io.ktor:ktor-client-cio:2.3.7")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
         }
 
@@ -113,8 +120,18 @@ kotlin {
     }
 }
 
+rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootPlugin> {
+    rootProject.the<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension>().nodeVersion = "16.0.0"
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
     dependsOn(unzipTask)
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile>().configureEach {
+    kotlinOptions {
+        freeCompilerArgs += "-opt-in=kotlinx.cinterop.ExperimentalForeignApi"
+    }
 }
 
 tasks.withType<Copy> {
@@ -123,6 +140,42 @@ tasks.withType<Copy> {
     }
 }
 
+tasks.withType<KotlinNativeLink>()
+    .matching { linkTask -> linkTask.binary is AbstractExecutable }
+    .configureEach {
+        val task: KotlinNativeLink = this
+
+        doLast {
+            val binary: NativeBinary = task.binary
+            val outputDir: File = task.outputFile.get().parentFile
+            task.libraries
+                .filter { library -> library.extension == "klib" }
+                .filter(File::exists)
+                .forEach { inputFile ->
+                    val klibKonan = KonanFile(inputFile.path)
+                    val klib = KotlinLibraryLayoutImpl(
+                        klib = klibKonan,
+                        component = "default"
+                    )
+                    val layout = klib.extractingToTemp
+
+                    // extracting bundles
+                    layout
+                        .resourcesDir
+                        .absolutePath
+                        .let(::File)
+                        .listFiles(FileFilter { it.extension == "bundle" })
+                        // copying bundles to app
+                        ?.forEach { bundleFile ->
+                            logger.info("${bundleFile.absolutePath} copying to $outputDir")
+                            bundleFile.copyRecursively(
+                                target = File(outputDir, bundleFile.name),
+                                overwrite = true
+                            )
+                        }
+                }
+        }
+    }
 
 compose.experimental {
     web.application {}

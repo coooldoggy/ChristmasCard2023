@@ -16,6 +16,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import common.BasicTextField
 import file.JsonStrings
+import file.getData
 import org.jetbrains.skia.skottie.AnimationBuilder
 import skiko.SkikoManager
 
@@ -34,7 +35,7 @@ fun CardMain() {
 fun SayHi() {
     val santaJsonString = JsonStrings.getSantaJson()
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+    Column(modifier = Modifier.fillMaxWidth().background(Color.White)) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Canvas(modifier = Modifier.fillMaxSize()) {
                 AnimationBuilder().buildFromString(santaJsonString)
