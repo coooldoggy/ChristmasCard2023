@@ -11,10 +11,10 @@ So I will keep making this project and send this card next year lol :) 😂
   - Kamel : I dunno why yet. Should have to figure it out 
 
 ## References 
-[Kotlin Wasm](https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance)https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance
-[Getting Start with Wasm](https://kotlinlang.org/docs/wasm-get-started.html#run-the-application)https://kotlinlang.org/docs/wasm-get-started.html#run-the-application
-[Skiko](https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html)https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html
-[Compottie](https://github.com/alexzhirkevich/compottie)https://github.com/alexzhirkevich/compottie
-[Kamel](https://github.com/Kamel-Media/Kamel)https://github.com/Kamel-Media/Kamel
-[Kmp Awesome](https://github.com/terrakok/kmp-awesome)https://github.com/terrakok/kmp-awesome
-[Kotlin-wasm-example](https://github.com/Kotlin/kotlin-wasm-examples/tree/main)https://github.com/Kotlin/kotlin-wasm-examples/tree/main
+- [Kotlin Wasm : ](https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance)https://kotlinlang.org/docs/wasm-overview.html#kotlin-wasm-performance
+- [Getting Start with Wasm : ](https://kotlinlang.org/docs/wasm-get-started.html#run-the-application)https://kotlinlang.org/docs/wasm-get-started.html#run-the-application
+- [Skiko : ](https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html)https://jetbrains.github.io/skiko/skiko/org.jetbrains.skiko/index.html
+- [Compottie : ](https://github.com/alexzhirkevich/compottie)https://github.com/alexzhirkevich/compottie
+- [Kamel : ](https://github.com/Kamel-Media/Kamel)https://github.com/Kamel-Media/Kamel
+- [Kmp Awesome : ](https://github.com/terrakok/kmp-awesome)https://github.com/terrakok/kmp-awesome
+- [Kotlin-wasm-example : ](https://github.com/Kotlin/kotlin-wasm-examples/tree/main)https://github.com/Kotlin/kotlin-wasm-examples/tree/main
