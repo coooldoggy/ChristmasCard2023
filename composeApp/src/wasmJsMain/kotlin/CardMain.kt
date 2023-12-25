@@ -15,8 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import common.BasicTextField
-import org.jetbrains.skia.Data
-import org.jetbrains.skia.skottie.Animation
+import file.JsonStrings
 import org.jetbrains.skia.skottie.AnimationBuilder
 import skiko.SkikoManager
 
@@ -32,24 +31,26 @@ fun CardMain() {
 }
 
 @Composable
-fun SayHi(){
-    val santa = AnimationBuilder()
-    val skikoCanvas = skikoManager.getSkikoCanvas().drawSomething()
+fun SayHi() {
+    val santaJsonString = JsonStrings.getSantaJson()
+
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-//                santa.render(skikoCanvas)
+                AnimationBuilder().buildFromString(santaJsonString)
+                    .render(skikoManager.getSkikoCanvas().drawSomething())
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
             InputName(userInputName = "", onClickSend = {
-                
+
             })
         }
     }
 }
 
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InputName(userInputName: String, onClickSend: (String) -> Unit) {
     var inputName by remember { mutableStateOf(userInputName) }

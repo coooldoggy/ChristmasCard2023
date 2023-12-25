@@ -5,8 +5,8 @@ import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    
     alias(libs.plugins.jetbrainsCompose)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 
@@ -65,10 +65,10 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 kotlin {
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
-        moduleName = "ChristmasCard2023"
+        moduleName = "composeApp"
         browser {
             commonWebpackConfig {
-                outputFileName = "christmasCard2023.js"
+                outputFileName = "composeApp.js"
                 devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
@@ -94,6 +94,7 @@ kotlin {
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
             implementation("org.jetbrains.skiko:skiko:$version")
+            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
         }
 
         val commonMain by getting {
