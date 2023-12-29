@@ -59,7 +59,7 @@ val unzipTask = tasks.register("unzipWasm", Copy::class) {
 dependencies {
     if (isCompositeBuild) {
         val filePath = gradle.includedBuild("skiko").projectDir
-            .resolve("./build/libs/skiko-wasm-$version.jar")
+                .resolve("./build/libs/skiko-wasm-$version.jar")
         skikoWasm(files(filePath))
     } else {
         skikoWasm("org.jetbrains.skiko:skiko-js-wasm-runtime:$version")
@@ -67,6 +67,8 @@ dependencies {
 }
 
 kotlin {
+    explicitApi = ExplicitApiMode.Warning
+
     @OptIn(ExperimentalWasmDsl::class)
     wasmJs {
         moduleName = "composeApp"
@@ -97,10 +99,11 @@ kotlin {
 //            implementation("com.arkivanov.decompose:extensions-compose-jetbrains:2.2.2-compose-experimental")
             @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
             implementation(compose.components.resources)
-           implementation("media.kamel:kamel-image:0.9.1")
+//            implementation("media.kamel:kamel-image:0.9.1")
+//            api("io.github.qdsfdhvh:image-loader:1.7.1")
             implementation("org.jetbrains.skiko:skiko:$version")
-            implementation("io.ktor:ktor-client-core:2.3.7")
-            implementation("io.ktor:ktor-client-cio:2.3.7")
+//            implementation("io.ktor:ktor-client-core:2.3.7")
+//            implementation("io.ktor:ktor-client-cio:2.3.7")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.2")
         }
 
@@ -108,15 +111,29 @@ kotlin {
             dependsOn(commonMain.get())
         }
 
-        val jsWasmMain by creating {
-            dependsOn(commonMain)
-            resources.setSrcDirs(resources.srcDirs)
-            resources.srcDirs(unzipTask.map { it.destinationDir })
-        }
+//        val jsWasmMain by creating {
+//            dependsOn(commonMain)
+//            dependencies {
+//                api("io.github.qdsfdhvh:image-loader-extension-imageio:1.7.1")
+//            }
+//            resources.setSrcDirs(resources.srcDirs)
+//            resources.srcDirs(unzipTask.map { it.destinationDir })
+//        }
 
         val wasmJsMain by getting {
-            dependsOn(jsWasmMain)
+            dependsOn(commonMain)
+            resources.srcDir("../common/src/commonMain/resources")
+            dependencies {
+//                api("io.github.qdsfdhvh:image-loader-extension-imageio:1.7.1")
+//                implementation(compose.runtime)
+//                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+//                implementation(compose.components.resources)
+            }
         }
+
+//        val wasmJsMain by getting {
+//            dependsOn(jsWasmMain)
+//        }
     }
 }
 
@@ -141,41 +158,65 @@ tasks.withType<Copy> {
 }
 
 tasks.withType<KotlinNativeLink>()
-    .matching { linkTask -> linkTask.binary is AbstractExecutable }
-    .configureEach {
-        val task: KotlinNativeLink = this
+        .matching { linkTask -> linkTask.binary is AbstractExecutable }
+        .configureEach {
+            val task: KotlinNativeLink = this
 
-        doLast {
-            val binary: NativeBinary = task.binary
-            val outputDir: File = task.outputFile.get().parentFile
-            task.libraries
-                .filter { library -> library.extension == "klib" }
-                .filter(File::exists)
-                .forEach { inputFile ->
-                    val klibKonan = KonanFile(inputFile.path)
-                    val klib = KotlinLibraryLayoutImpl(
-                        klib = klibKonan,
-                        component = "default"
-                    )
-                    val layout = klib.extractingToTemp
-
-                    // extracting bundles
-                    layout
-                        .resourcesDir
-                        .absolutePath
-                        .let(::File)
-                        .listFiles(FileFilter { it.extension == "bundle" })
-                        // copying bundles to app
-                        ?.forEach { bundleFile ->
-                            logger.info("${bundleFile.absolutePath} copying to $outputDir")
-                            bundleFile.copyRecursively(
-                                target = File(outputDir, bundleFile.name),
-                                overwrite = true
+            doLast {
+                val binary: NativeBinary = task.binary
+                val outputDir: File = task.outputFile.get().parentFile
+                task.libraries
+                        .filter { library -> library.extension == "klib" }
+                        .filter(File::exists)
+                        .forEach { inputFile ->
+                            val klibKonan = KonanFile(inputFile.path)
+                            val klib = KotlinLibraryLayoutImpl(
+                                    klib = klibKonan,
+                                    component = "default"
                             )
+                            val layout = klib.extractingToTemp
+
+                            // extracting bundles
+                            layout
+                                    .resourcesDir
+                                    .absolutePath
+                                    .let(::File)
+                                    .listFiles(FileFilter { it.extension == "bundle" })
+                                    // copying bundles to app
+                                    ?.forEach { bundleFile ->
+                                        logger.info("${bundleFile.absolutePath} copying to $outputDir")
+                                        bundleFile.copyRecursively(
+                                                target = File(outputDir, bundleFile.name),
+                                                overwrite = true
+                                        )
+                                    }
                         }
-                }
+            }
         }
+
+tasks.withType<AbstractNativeMacApplicationPackageAppDirTask> {
+    val task: AbstractNativeMacApplicationPackageAppDirTask = this
+
+    doLast {
+        val execFile: File = task.executable.get().asFile
+        val execDir: File = execFile.parentFile
+        val destDir: File = task.destinationDir.asFile.get()
+        val bundleID: String = task.bundleID.get()
+
+        val outputDir = File(destDir, "$bundleID.app/Contents/Resources")
+        outputDir.mkdirs()
+
+        execDir.listFiles().orEmpty()
+                .filter { it.extension == "bundle" }
+                .forEach { bundleFile ->
+                    logger.info("${bundleFile.absolutePath} copying to $outputDir")
+                    bundleFile.copyRecursively(
+                            target = File(outputDir, bundleFile.name),
+                            overwrite = true
+                    )
+                }
     }
+}
 
 compose.experimental {
     web.application {}

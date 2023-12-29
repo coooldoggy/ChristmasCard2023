@@ -1,22 +1,24 @@
 @file:OptIn(ExperimentalFoundationApi::class, ExperimentalFoundationApi::class)
 
-import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.onClick
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import common.BasicTextField
+import file.FileUtils
+import file.FileUtils.loadWebMFile
 import file.JsonStrings
 import file.getData
+
 import org.jetbrains.skia.skottie.AnimationBuilder
 import skiko.SkikoManager
 
@@ -33,13 +35,15 @@ fun CardMain() {
 
 @Composable
 fun SayHi() {
-    val santaJsonString = JsonStrings.getSantaJson()
-
+    val santa = "https://github.com/coooldoggy/ChristmasCard2023/blob/main/images/santa.webm"
     Column(modifier = Modifier.fillMaxWidth().background(Color.White)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-            Canvas(modifier = Modifier.fillMaxSize()) {
-                AnimationBuilder().buildFromString(santaJsonString)
-                    .render(skikoManager.getSkikoCanvas().drawSomething())
+//            Canvas(modifier = Modifier.fillMaxSize()) {
+//                AnimationBuilder().buildFromString(santaJsonString)
+//                    .render(skikoManager.getSkikoCanvas().drawSomething())
+//            }
+            Surface(modifier = Modifier.size(100.dp)) {
+                loadWebMFile(santa)   
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
