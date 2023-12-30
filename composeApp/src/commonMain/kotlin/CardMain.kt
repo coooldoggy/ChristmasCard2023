@@ -10,16 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import common.BasicTextField
-import file.FileUtils
-import file.FileUtils.loadWebMFile
-import file.JsonStrings
-import file.getData
+import file.getPath
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
-import org.jetbrains.skia.skottie.AnimationBuilder
 import skiko.SkikoManager
 
 private val skikoManager by lazy {
@@ -33,17 +30,17 @@ fun CardMain() {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SayHi() {
-    val santa = "https://github.com/coooldoggy/ChristmasCard2023/blob/main/images/santa.webm"
-    Column(modifier = Modifier.fillMaxWidth().background(Color.White)) {
+    val santa = getPath(directory = "resources", fileName = "santa.webm")
+    val paint = painterResource("santa.webm")
+    println("!!!!!!!!!! $paint")
+    Column(modifier = Modifier.fillMaxWidth().background(Color.White).padding(16.dp)) {
         Row(modifier = Modifier.fillMaxWidth()) {
-//            Canvas(modifier = Modifier.fillMaxSize()) {
-//                AnimationBuilder().buildFromString(santaJsonString)
-//                    .render(skikoManager.getSkikoCanvas().drawSomething())
-//            }
-            Surface(modifier = Modifier.size(100.dp)) {
-                loadWebMFile(santa)   
+            Box(modifier = Modifier.size(500.dp).background(Color.Red)){
+                val mediaLoader = MediaLoader.provideMediaLoader()
+                mediaLoader.loadWebM("https://github.com/coooldoggy/ChristmasCard2023/blob/main/images/giftbox.mp4")
             }
         }
         Row(modifier = Modifier.fillMaxWidth()) {
